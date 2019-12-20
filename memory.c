@@ -64,7 +64,8 @@ fst_node *find_best_fit_free_space(free_space_table *fst, int length)
 
 void best_fit_recover(free_space_table *fst, space *it)
 {
-  if(!it){
+  if (!it)
+  {
     printf("TASK ID NOT FOUND.");
     return;
   }
@@ -87,19 +88,24 @@ void best_fit_recover(free_space_table *fst, space *it)
       //set previous pointer as the current pointer
       it = prev;
       //remove corresponding free space table node
-      fst_node* fn = fst->head;
-      while(fn){
-        if(fn->spc->id==it->id){
+      fst_node *fn = fst->head;
+      while (fn)
+      {
+        if (fn->spc->id == it->id)
+        {
           break;
         }
       }
-      if(fn->prev){
+      if (fn->prev)
+      {
         fn->prev->next = fn->next;
       }
-      else{
+      else
+      {
         fst->head = fn->next;
       }
-      if(fn->next){
+      if (fn->next)
+      {
         fn->next->prev = fn->prev;
       }
       free(fn);
@@ -120,19 +126,24 @@ void best_fit_recover(free_space_table *fst, space *it)
       }
 
       //remove corresponding free space table node
-      fst_node* fn = fst->head;
-      while(fn){
-        if(fn->spc->id==next->id){
+      fst_node *fn = fst->head;
+      while (fn)
+      {
+        if (fn->spc->id == next->id)
+        {
           break;
         }
       }
-      if(fn->prev){
+      if (fn->prev)
+      {
         fn->prev->next = fn->next;
       }
-      else{
+      else
+      {
         fst->head = fn->next;
       }
-      if(fn->next){
+      if (fn->next)
+      {
         fn->next->prev = fn->prev;
       }
       free(fn);
@@ -141,55 +152,61 @@ void best_fit_recover(free_space_table *fst, space *it)
     }
   }
   //add new free space table node
-  fst_node* fn = (fst_node*)malloc(sizeof(struct fst_node));
+  fst_node *fn = (fst_node *)malloc(sizeof(struct fst_node));
   fn->spc = it;
-  fst_node* tmp = fst->head;
+  fst_node *tmp = fst->head;
   if (!tmp)
   {
     fst->head = fn;
     fn->next = NULL;
     fn->prev = NULL;
     it->id = -1;
-    return ;
+    return;
   }
-  if(tmp->spc->length>it->length){
+  if (tmp->spc->length > it->length)
+  {
     fn->next = fst->head;
     fn->prev = NULL;
-    if(fst->head){
+    if (fst->head)
+    {
       fst->head->prev = fn;
     }
     fst->head = fn;
     it->id = -1;
-    return ;
+    return;
   }
 
-  while(tmp->next){
-    if(tmp->next->spc->length>it->length){
+  while (tmp->next)
+  {
+    if (tmp->next->spc->length > it->length)
+    {
       break;
     }
     tmp = tmp->next;
   }
   fn->next = tmp->next;
   fn->prev = tmp;
-  if(tmp->next){
+  if (tmp->next)
+  {
     tmp->next->prev = fn;
   }
   tmp->next = fn;
   it->id = -1;
 }
 
-void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
+void best_fit_allocation(memory *mem, free_space_table *fst, node *n)
 {
   if (!n)
   {
-    return ;
+    return;
   }
-  space* spc_tmp = mem->head;
-  while(spc_tmp){
-    if (spc_tmp->id==n->id)
+  space *spc_tmp = mem->head;
+  while (spc_tmp)
+  {
+    if (spc_tmp->id == n->id)
     {
       printf("TASK ID ALREADY EXISTS.\n");
-      return ;
+      return;
     }
     spc_tmp = spc_tmp->next;
   }
@@ -199,7 +216,7 @@ void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
   {
     fre_spc->id = n->id;
     fre_spc->state = 1;
-    space *spc=NULL;
+    space *spc = NULL;
     if (n->length < fre_spc->length)
     {
       // allocate new space and seperate current space
@@ -214,12 +231,13 @@ void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
       fre_spc->next = spc;
     }
     //remove it in the free space table
-    fst_node* fn_prev = fn->prev;
+    fst_node *fn_prev = fn->prev;
     if (fn->prev)
     {
       fn->prev->next = fn->next;
     }
-    else{
+    else
+    {
       fst->head = fn->next;
     }
     if (fn->next)
@@ -228,15 +246,17 @@ void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
     }
     free(fn);
     //adjust free space position
-    if(spc){
+    if (spc)
+    {
       while (fn_prev)
       {
-        if(fn_prev->spc->length<spc->length){
+        if (fn_prev->spc->length < spc->length)
+        {
           break;
         }
         fn_prev = fn_prev->prev;
       }
-      fst_node* new_fn = (fst_node*)malloc(sizeof(struct fst_node));
+      fst_node *new_fn = (fst_node *)malloc(sizeof(struct fst_node));
       new_fn->spc = spc;
       if (fn_prev)
       {
@@ -251,7 +271,7 @@ void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
       else
       {
         new_fn->next = fst->head;
-        if(fst->head)
+        if (fst->head)
         {
           fst->head->prev = new_fn;
         }
@@ -264,7 +284,7 @@ void best_fit_allocation(memory* mem,free_space_table *fst, node *n)
   {
     printf("NO ENOUGH SPACE.\n");
   }
-  return ;
+  return;
 }
 fst_node *find_fst_postion(free_space_table *fst, int length)
 {
@@ -322,7 +342,7 @@ void print_free_space_table(free_space_table *fst)
     printf("-");
   }
   printf("+\n");
-  printf("|%-15s|%-15s|\n","start point", "length");
+  printf("|%-15s|%-15s|\n", "start point", "length");
   printf("+");
   for (int i = 0; i < 31; i++)
   {
